@@ -1,66 +1,99 @@
+document.addEventListener('DOMContentLoaded', function () {
+    const preferencesForm = document.getElementById('preferences-form');
+    const recipesContainer = document.getElementById('recipes-container');
 
-JavaScript (script.js)
-javascript
-Copy code
-// Replace with your actual Spoonacular API key
-const API_KEY = 'your_spoonacular_api_key';
-const API_BASE_URL = 'https://api.spoonacular.com/recipes/complexSearch';
+    // Handle form submission for searching recipes
+    preferencesForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
 
-document.getElementById('search-button').addEventListener('click', async () => {
-    const query = document.getElementById('search-input').value;
-    if (!query) {
-        alert('Please enter a recipe name to search.');
-        return;
+        // Get user input
+        const query = document.getElementById('query').value.trim();
+        const ingredients = document.getElementById('ingredients').value.trim();
+
+        // Prepare search criteria
+        const searchParams = {
+            query: query || null, // Search by recipe name
+            ingredients: ingredients ? ingredients.split(',').map(i => i.trim()) : null // Search by ingredients
+        };
+
+        try {
+            // Send POST request to backend
+            const response = await fetch('/search-recipes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(searchParams),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch recipes.');
+            }
+
+            const data = await response.json();
+            displayRecipes(data.recipes);
+        } catch (error) {
+            console.error('Error fetching recipes:', error);
+            recipesContainer.innerHTML = `<p>Error fetching recipes: ${error.message}</p>`;
+        }
+    });
+
+    // Display fetched recipes
+    function displayRecipes(recipes) {
+        recipesContainer.innerHTML = ''; // Clear previous results
+
+        if (recipes.length === 0) {
+            recipesContainer.innerHTML = '<p>No recipes found. Try different inputs.</p>';
+            return;
+        }
+
+        recipes.forEach(recipe => {
+            const recipeCard = document.createElement('div');
+            recipeCard.classList.add('recipe-card');
+            recipeCard.innerHTML = `
+                <h3>${recipe.title}</h3>
+                <img src="${recipe.image}" alt="${recipe.title}">
+                <p><strong>Cooking Time:</strong> ${recipe.readyInMinutes} minutes</p>
+                <button onclick="fetchNutrition(${recipe.id})">View Nutrition</button>
+            `;
+            recipesContainer.appendChild(recipeCard);
+        });
     }
-    
-    try {
-        const response = await fetch(`${API_BASE_URL}?query=${query}&number=6&apiKey=${API_KEY}`);
-        const data = await response.json();
-        displayRecipes(data.results);
-    } catch (error) {
-        console.error('Error fetching recipes:', error);
-        alert('An error occurred while fetching recipes. Please try again.');
+
+    // Fetch and display nutrition data
+    window.fetchNutrition = async function (recipeId) {
+        try {
+            const response = await fetch('/fetch-nutrition', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ recipe_id: recipeId }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch nutrition details.');
+            }
+
+            const data = await response.json();
+            displayNutrition(data.nutrition);
+        } catch (error) {
+            console.error('Error fetching nutrition details:', error);
+        }
+    };
+
+    // Display nutrition details
+    function displayNutrition(nutrition) {
+        const nutritionSection = document.getElementById('nutrition-section');
+        const nutritionInfo = document.getElementById('nutrition-info');
+
+        nutritionInfo.innerHTML = `
+            <h3>Nutrition Details</h3>
+            <p><strong>Calories:</strong> ${nutrition.calories} kcal</p>
+            <p><strong>Carbs:</strong> ${nutrition.carbs}</p>
+            <p><strong>Protein:</strong> ${nutrition.protein}</p>
+            <p><strong>Fat:</strong> ${nutrition.fat}</p>
+        `;
+        nutritionSection.classList.remove('hidden');
     }
 });
-
-function displayRecipes(recipes) {
-    const recipesContainer = document.getElementById('recipes-container');
-    recipesContainer.innerHTML = ''; // Clear previous results
-
-    if (recipes.length === 0) {
-        recipesContainer.innerHTML = '<p>No recipes found. Try another search!</p>';
-        return;
-    }
-
-    recipes.forEach(recipe => {
-        const recipeCard = document.createElement('div');
-        recipeCard.className = 'recipe-card';
-        recipeCard.innerHTML = `
-            <img src="${recipe.image}" alt="${recipe.title}">
-            <h3>${recipe.title}</h3>
-            <button onclick="fetchNutrition(${recipe.id})">View Nutrition</button>
-        `;
-        recipesContainer.appendChild(recipeCard);
-    });
-}
-
-async function fetchNutrition(recipeId) {
-    try {
-        const response = await fetch(`https://api.spoonacular.com/recipes/${recipeId}/nutritionWidget.json?apiKey=${API_KEY}`);
-        const nutritionData = await response.json();
-        displayNutrition(nutritionData);
-    } catch (error) {
-        console.error('Error fetching nutrition details:', error);
-        alert('An error occurred while fetching nutrition details.');
-    }
-}
-
-function displayNutrition(nutrition) {
-    const nutritionInfo = document.getElementById('nutrition-info');
-    nutritionInfo.innerHTML = `
-        <p><strong>Calories:</strong> ${nutrition.calories} kcal</p>
-        <p><strong>Carbohydrates:</strong> ${nutrition.carbs}</p>
-        <p><strong>Protein:</strong> ${nutrition.protein}</p>
-        <p><strong>Fat:</strong> ${nutrition.fat}</p>
-    `;
-}

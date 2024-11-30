@@ -9,34 +9,62 @@
 <body>
     <header>
         <h1>Meal Planner with Nutrition Insights</h1>
-        <p>Your personalized meal planning and nutrition companion.</p>
+        <p>Your personalized meal planning and nutrition companion</p>
     </header>
+
     <main>
-        <!-- Recipe Search Section -->
-        <section id="search-section">
-            <h2>Find Recipes</h2>
-            <input type="text" id="search-input" placeholder="Search for recipes (e.g., pasta, salad)" />
-            <button id="search-button">Search</button>
+        <section id="preferences-section">
+            <h2>Meal Preferences</h2>
+            <form id="preferences-form">
+                <div class="form-group">
+                    <label for="diet">Diet Type:</label>
+                    <select name="diet" id="diet">
+                        <option value="">Any</option>
+                        <option value="vegetarian">Vegetarian</option>
+                        <option value="vegan">Vegan</option>
+                        <option value="keto">Keto</option>
+                        <option value="paleo">Paleo</option>
+                        <option value="gluten-free">Gluten-Free</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cuisine">Cuisine:</label>
+                    <select name="cuisine" id="cuisine">
+                        <option value="">Any</option>
+                        <option value="italian">Italian</option>
+                        <option value="mexican">Mexican</option>
+                        <option value="asian">Asian</option>
+                        <option value="mediterranean">Mediterranean</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="ingredients">Ingredient Preferences (comma-separated):</label>
+                    <input type="text" name="ingredients" id="ingredients" placeholder="e.g., chicken, tomato, basil">
+                </div>
+
+                <button type="submit">Find Recipes</button>
+            </form>
         </section>
 
-        <!-- Recipe Results Section -->
-        <section id="results-section">
-            <h2>Recipe Results</h2>
+        <section id="recipes-section">
+            <h2>Recipes</h2>
             <div id="recipes-container">
                 <!-- Recipes will be dynamically added here -->
             </div>
         </section>
 
-        <!-- Nutritional Details Section -->
-        <section id="nutrition-section">
+        <section id="nutrition-section" class="hidden">
             <h2>Nutrition Details</h2>
             <div id="nutrition-info">
-                <!-- Nutritional info will be dynamically added here -->
+                <!-- Nutrition details will be dynamically added here -->
             </div>
         </section>
     </main>
+
     <footer>
-        <p>Powered by Spoonacular API</p>
+        <p>Powered by Spoonacular API | Nutrition Insights</p>
     </footer>
 
     <script src="script.js"></script>

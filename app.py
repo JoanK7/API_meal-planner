@@ -1,56 +1,57 @@
 from flask import Flask, request, jsonify
 import requests
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
 
-# API key for nutrition API (e.g., Edamam, Spoonacular)
-API_KEY = "your_api_key"
-API_URL = "https://api.spoonacular.com/recipes/complexSearch"
-NUTRITION_API_URL = "https://api.spoonacular.com/recipes/{id}/nutritionWidget.json"
+# Spoonacular API configuration
+API_KEY = os.getenv("SPOONACULAR_API_KEY")
+API_BASE_URL = "https://api.spoonacular.com/recipes"
 
-# Route for home page
-@app.route('/')
-def home():
-    return "Meal Planner Backend is Running!"
+if not API_KEY:
+    raise ValueError("SPOONACULAR_API_KEY not found. Check .env file.")
 
-
-# Route to get recipe recommendations
-@app.route('/get-recommendations', methods=['POST'])
-def get_recommendations():
+@app.route('/search-recipes', methods=['POST'])
+def search_recipes():
     data = request.get_json()
-    preferences = data.get("preferences", {})
-    ingredients = data.get("ingredients", [])
+    query = data.get('query')
+    ingredients = data.get('ingredients')
 
-    # Call Spoonacular's Recipe API with user inputs
     params = {
         "apiKey": API_KEY,
-        "includeIngredients": ",".join(ingredients),
-        "diet": preferences.get("diet"),
-        "cuisine": preferences.get("cuisine"),
-        "number": 5,
+        "number": 6  # Limit to 6 results
     }
 
+    # Add query or ingredients to search parameters
+    if query:
+        params["query"] = query
+    if ingredients:
+        params["includeIngredients"] = ','.join(ingredients)
+
     try:
-        response = requests.get(API_URL, params=params)
+        response = requests.get(f"{API_BASE_URL}/complexSearch", params=params)
+        response.raise_for_status()
         recipes = response.json().get("results", [])
         return jsonify({"recipes": recipes})
-    except Exception as e:
+    except requests.exceptions.RequestException as e:
         return jsonify({"error": str(e)}), 500
 
-
-# Route to fetch detailed nutrition information
 @app.route('/fetch-nutrition', methods=['POST'])
 def fetch_nutrition():
     data = request.get_json()
     recipe_id = data.get("recipe_id")
 
     try:
-        response = requests.get(NUTRITION_API_URL.format(id=recipe_id), params={"apiKey": API_KEY})
-        nutrition_data = response.json()
-        return jsonify({"nutrition": nutrition_data})
-    except Exception as e:
+        response = requests.get(f"{API_BASE_URL}/{recipe_id}/nutritionWidget.json", params={"apiKey": API_KEY})
+        response.raise_for_status()
+        nutrition = response.json()
+        return jsonify({"nutrition": nutrition})
+    except requests.exceptions.RequestException as e:
         return jsonify({"error": str(e)}), 500
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
