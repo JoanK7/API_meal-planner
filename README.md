@@ -19,7 +19,8 @@ Search for recipes by name or ingredients.
 
 **Clone the Repository:**
 git clone https://github.com/yourusername/API_meal-planner.git
-cd recipe-finder
+
+cd API_meal-planner
 
 **Setup API Key:**
 Obtain an API key from Spoonacular.
