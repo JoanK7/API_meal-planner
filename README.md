@@ -14,7 +14,8 @@ Search for recipes by name or ingredients.
 - CSS: For styling the application interface.
 - JavaScript: For handling user interactions and API requests.
 - Spoonacular API: Used for fetching recipe data.
-- How to Run Locally
+
+**How to Run Locally**
 
 **Clone the Repository:**
 git clone https://github.com/yourusername/recipe-finder.git
