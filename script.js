@@ -1,16 +1,22 @@
-// Spoonacular API Key
-const API_KEY = "";
+// Encryption function
+function decryptKey(encryptedKey) {
+    return encryptedKey.split('').map(char => 
+        String.fromCharCode(char.charCodeAt(0) - 1)
+    ).join('');
+}
+
+const ENCRYPTED_KEY = '7gc:d85646de5ec3bdb815ce28c3geb1';
+const API_KEY = decryptKey(ENCRYPTED_KEY);
 
 // Handle form submission
 document.getElementById('search-form').addEventListener('submit', async function (event) {
     event.preventDefault();
-
     const recipeName = document.getElementById('recipe-name').value.trim();
     const ingredients = document.getElementById('ingredients').value.trim();
-
+    
     // Build API URL
     const apiUrl = `https://api.spoonacular.com/recipes/complexSearch?apiKey=${API_KEY}&query=${recipeName}&includeIngredients=${ingredients}&number=5`;
-
+    
     try {
         // Fetch data from Spoonacular
         const response = await fetch(apiUrl);
@@ -26,12 +32,12 @@ document.getElementById('search-form').addEventListener('submit', async function
 function displayRecipes(recipes) {
     const recipesContainer = document.getElementById('recipes-container');
     recipesContainer.innerHTML = ''; // Clear previous results
-
+    
     if (!recipes || recipes.length === 0) {
         recipesContainer.innerHTML = '<p>No recipes found. Try again.</p>';
         return;
     }
-
+    
     recipes.forEach(recipe => {
         const recipeCard = document.createElement('div');
         recipeCard.className = 'recipe-card';
