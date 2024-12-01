@@ -18,7 +18,7 @@ Search for recipes by name or ingredients.
 **How to Run Locally**
 
 **Clone the Repository:**
-git clone https://github.com/yourusername/recipe-finder.git
+git clone https://github.com/yourusername/API_meal-planner.git
 cd recipe-finder
 
 **Setup API Key:**
