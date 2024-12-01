@@ -113,4 +113,5 @@ Issue: Ensuring traffic is evenly distributed between Web01 and Web02.
 Solution: Configured Nginx with the upstream directive to handle load balancing effectively.
 
 Online link to the recipe finder: https://www.joank7.tech/
+
 Demo video: https://youtu.be/jKU4UgCjKVs
